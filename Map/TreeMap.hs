@@ -60,13 +60,12 @@ insertOrMerge k v (Branch l ka va r)
 -- When inserting mappings with the same key, the last one should overwrite previous ones.
 -- E.g. the Map created using `fromList [("a", 1), ("a", 2)]` should only contain `("a", 2)`.
 fromList :: Ord k => [(k,v)] -> Map k v
-fromList = todo
-
+fromList = foldl (\m (k, v) -> insert k v m ) Empty
 
 -- Creates a Map from a list of pairs.
 -- Use foldr and the insertOrMerge function to implement fromListMerge.
 fromListMerge :: (Ord k, Semigroup v) => [(k,v)] -> Map k v
-fromListMerge = todo
+fromListMerge = foldl (\m (k, v) -> insertOrMerge k v m ) Empty
 
 
 -- Returns the list of mappings.
