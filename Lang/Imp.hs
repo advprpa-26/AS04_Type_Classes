@@ -43,9 +43,30 @@ data Cmd =
 
 eval :: Expr a -> State -> a
 eval (BNot b) st = not (eval b st)
-eval _ _ = todo
+eval (BAnd a b) st = (eval a st) && (eval b st)
+eval (BOr a b) st = (eval a st) || (eval b st)
+
+eval (REq a b) st = (eval a st) == (eval b st)
+eval (RLt a b) st = (eval a st) < (eval b st)
+
+eval (AConst a) st= a 
+eval (AVar name) st = 
+  case M.lookup name st of
+    Just v -> v
+    Nothing -> error ("var not found: " ++ name)
+
+eval (APlus a b) st = (eval a st) + (eval b st) 
+eval (AMinus a b) st = (eval a st) - (eval b st) 
+eval (AMul a b) st = (eval a st) * (eval b st) 
+eval (ADiv a b) st = (eval a st) `div` (eval b st) 
+eval (AMod a b) st = (eval a st) `mod` (eval b st) 
+
+
 
 exec :: Cmd -> State -> State
 exec CSkip st = st
-exec _ _ = todo
-
+exec (CAssign name e) st = M.insert name (eval e st) st
+exec (CIfThEl e c1 c2) st = if (eval e st) then exec c1 st else exec c2 st
+exec (CWhile e c) st = if (eval e st) then exec (CWhile e c) (exec c st) else st
+exec (CSeq []) st = st
+exec (CSeq (a:l)) st = exec (CSeq l) (exec a st)

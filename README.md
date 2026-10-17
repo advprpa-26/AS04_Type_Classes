@@ -12,6 +12,7 @@ Manually implement instances for the classes `Show`, `Eq` and `Ord`. Equality an
 Run `ghci TypeClasses/Person.hs` to load the code into ghci.
 
 
+
 ## Natural Numbers in Haskell
 
 Natural numbers can be represented using the following type:
