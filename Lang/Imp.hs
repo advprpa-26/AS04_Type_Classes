@@ -43,9 +43,46 @@ data Cmd =
 
 eval :: Expr a -> State -> a
 eval (BNot b) st = not (eval b st)
-eval _ _ = todo
+-- Bool
+eval (BNot b)   st = not (eval b st)
+eval (BAnd a b) st = eval a st && eval b st
+eval (BOr  a b) st = eval a st || eval b st
+
+-- Relational
+eval (REq a b)  st = eval a st == eval b st
+eval (RLt a b)  st = eval a st <  eval b st
+
+-- Integer
+eval (AConst n) st = n
+eval (AVar x)   st =
+    case M.lookup x st of
+      Just v  -> v
+      Nothing -> 0   -- Variablen ohne Wert = 0
+
+eval (APlus  a b) st = eval a st + eval b st
+eval (AMinus a b) st = eval a st - eval b st
+eval (AMul   a b) st = eval a st * eval b st
+eval (ADiv   a b) st = eval a st `div` eval b st
+eval (AMod   a b) st = eval a st `mod` eval b st
 
 exec :: Cmd -> State -> State
 exec CSkip st = st
-exec _ _ = todo
 
+exec (CAssign x e) st =
+    let v = eval e st
+    in M.insert x v st
+
+exec (CIfThEl cond cThen cElse) st =
+    if eval cond st
+      then exec cThen st
+      else exec cElse st
+
+exec (CWhile cond body) st =
+    if eval cond st
+      then exec (CWhile cond body) (exec body st)
+      else st
+
+exec (CSeq []) st = st
+exec (CSeq (c:cs)) st =
+    let st' = exec c st
+    in exec (CSeq cs) st'

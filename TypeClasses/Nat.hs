@@ -55,11 +55,14 @@ mul (S m) n = add n (mul m n)
 -- Conversion
 -- Negative inputs map to Z
 integerToNat :: Integer -> Nat
-integerToNat = todo
+integerToNat n
+  | n <= 0    = Z
+  | otherwise = S (integerToNat (n - 1))
 
 -- Conversion
 natToInteger :: Nat -> Integer
-natToInteger = todo
+natToInteger Z     = 0
+natToInteger (S n) = 1 + natToInteger n
 
 -- Num instance allows to use common arithmetic operations when writing expressions of type Nat.
 instance Num Nat where
@@ -90,6 +93,6 @@ instance Num Nat where
 
 main :: IO ()
 main = do
-    print ((1 + 3 * 13 - 3 + 5) :: Nat)
-    print $ natToInteger (1 + 3 * 13 - 3 + 5)
+  print ((1 + 3 * 13 - 3 + 5) :: Nat)
+  print $ natToInteger (1 + 3 * 13 - 3 + 5)
     
